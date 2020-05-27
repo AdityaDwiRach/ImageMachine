@@ -1,5 +1,8 @@
 package com.adr.imagemachine.database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -14,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity(tableName = "machine_data_table")
-public class MachineDataEntity {
+public class MachineDataEntity implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private int machineId;
     @ColumnInfo(name = "machineName")
@@ -47,6 +50,38 @@ public class MachineDataEntity {
         this.lastMaintainDate = lastMaintainDate;
         this.machineImage = machineImage;
     }
+
+    protected MachineDataEntity(Parcel in) {
+        machineId = in.readInt();
+        machineName = in.readString();
+        machineType = in.readString();
+        qrNumber = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(machineId);
+        dest.writeString(machineName);
+        dest.writeString(machineType);
+        dest.writeInt(qrNumber);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<MachineDataEntity> CREATOR = new Creator<MachineDataEntity>() {
+        @Override
+        public MachineDataEntity createFromParcel(Parcel in) {
+            return new MachineDataEntity(in);
+        }
+
+        @Override
+        public MachineDataEntity[] newArray(int size) {
+            return new MachineDataEntity[size];
+        }
+    };
 
     public List<byte[]> getMachineImage() {
         return machineImage;

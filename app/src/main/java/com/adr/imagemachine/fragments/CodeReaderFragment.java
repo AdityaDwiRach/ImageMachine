@@ -44,8 +44,6 @@ public class CodeReaderFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
         Button buttonScan = view.findViewById(R.id.btn_scan_qr_code_reader);
         buttonScan.setOnClickListener(new View.OnClickListener() {
             @Override

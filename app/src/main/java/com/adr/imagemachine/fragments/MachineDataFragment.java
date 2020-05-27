@@ -136,6 +136,18 @@ public class MachineDataFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        List<MachineDataEntity> listData = new GetAllData(getContext()).getAllData();
+        if (listData != null){
+            machineDataRVAdapter.setDataList(listData);
+        } else {
+            Log.d("Testing", "Data Null");
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void alertDialogDatePicker(){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());

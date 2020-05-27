@@ -12,21 +12,14 @@ import java.util.List;
 
 public class DateConverter {
 
-    private static Gson gson = new Gson();
-
     @TypeConverter
-    public static Date stringToDate(String data) {
-        if (data == null) {
-            return new Date();
-        }
+    public static Date longToDate(Long data) {
 
-        Type listType = new TypeToken<Date>() {}.getType();
-
-        return gson.fromJson(data, listType);
+        return data == null ? null : new Date(data);
     }
 
     @TypeConverter
-    public static String dateToString(Date date) {
-        return gson.toJson(date);
+    public static Long dateToLong(Date date) {
+        return date == null ? null : date.getTime();
     }
 }
