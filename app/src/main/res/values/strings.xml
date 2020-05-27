@@ -8,4 +8,9 @@
     <string name="machine_image_caps">MACHINE IMAGE</string>
     <string name="machine_data_detail_caps">MACHINE DATA DETAIL</string>
     <string name="scan_qr_caps">SCAN QR</string>
+    <string name="pick_date_caps">PICK DATE</string>
+    <string name="last_maintained_date">Last Maintained Date</string>
+    <string name="machine_qr_number">Machine QR Number</string>
+    <string name="machine_type">Machine Type</string>
+    <string name="machine_name">Machine Name</string>
 </resources>
