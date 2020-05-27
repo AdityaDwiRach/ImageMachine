@@ -1,5 +1,6 @@
 package com.adr.imagemachine.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,8 @@ import java.util.List;
 
 public class MachineDataRVAdapter extends RecyclerView.Adapter<MachineDataRVAdapter.ViewHolder> {
 
-    private ArrayList<MachineDataEntity> dataList = new ArrayList<>();
+    private ArrayList<MachineDataEntity> dataList;
+
     @NonNull
     @Override
     public MachineDataRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,8 +38,8 @@ public class MachineDataRVAdapter extends RecyclerView.Adapter<MachineDataRVAdap
         return dataList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(@NonNull View itemView) {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
 
@@ -47,5 +49,7 @@ public class MachineDataRVAdapter extends RecyclerView.Adapter<MachineDataRVAdap
 
     public void setDataList(List<MachineDataEntity> dataList){
         this.dataList = new ArrayList<>(dataList);
+        Log.d("Testing", dataList.toString());
+        notifyDataSetChanged();
     }
 }

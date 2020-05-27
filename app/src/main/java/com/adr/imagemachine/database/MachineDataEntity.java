@@ -2,6 +2,7 @@ package com.adr.imagemachine.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -29,8 +30,17 @@ public class MachineDataEntity {
     @ColumnInfo(name = "machineImage")
     private List<byte[]> machineImage = null;
 
-    public MachineDataEntity(int machineId, String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<byte[]> machineImage) {
+    MachineDataEntity(int machineId, String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<byte[]> machineImage) {
         this.machineId = machineId;
+        this.machineName = machineName;
+        this.machineType = machineType;
+        this.qrNumber = qrNumber;
+        this.lastMaintainDate = lastMaintainDate;
+        this.machineImage = machineImage;
+    }
+
+    @Ignore
+    public MachineDataEntity(String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<byte[]> machineImage) {
         this.machineName = machineName;
         this.machineType = machineType;
         this.qrNumber = qrNumber;
