@@ -16,8 +16,8 @@ import com.adr.imagemachine.R;
  */
 public class CodeReaderFragment extends Fragment {
 
-    public CodeReaderFragment() {
-        // Required empty public constructor
+    public static CodeReaderFragment newInstance() {
+        return new CodeReaderFragment();
     }
 
 

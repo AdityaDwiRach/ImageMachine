@@ -3,8 +3,13 @@ package com.adr.imagemachine.database;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
-import java.sql.Date;
+import com.adr.imagemachine.converter.ByteArrayConverter;
+import com.adr.imagemachine.converter.DateConverter;
+
+
+import java.util.Date;
 import java.util.List;
 
 @Entity(tableName = "machine_data_table")
@@ -17,8 +22,10 @@ public class MachineDataEntity {
     private String machineType;
     @ColumnInfo(name = "qrNumber")
     private int qrNumber;
+    @TypeConverters(DateConverter.class)
     @ColumnInfo(name = "lastMaintainDate")
     private Date lastMaintainDate;
+    @TypeConverters(ByteArrayConverter.class)
     @ColumnInfo(name = "machineImage")
     private List<byte[]> machineImage = null;
 

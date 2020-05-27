@@ -15,8 +15,8 @@ import com.adr.imagemachine.R;
  */
 public class MachineDataFragment extends Fragment {
 
-    public MachineDataFragment() {
-        // Required empty public constructor
+    public static MachineDataFragment newInstance() {
+        return new MachineDataFragment();
     }
 
 
