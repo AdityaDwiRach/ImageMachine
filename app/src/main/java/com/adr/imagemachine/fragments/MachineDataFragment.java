@@ -2,10 +2,12 @@ package com.adr.imagemachine.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Database;
@@ -14,6 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.adr.imagemachine.R;
 import com.adr.imagemachine.adapters.MachineDataRVAdapter;
@@ -23,7 +29,11 @@ import com.adr.imagemachine.database.MachineDataEntity;
 import com.adr.imagemachine.database.MachineDatabase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.crypto.Mac;
 
@@ -31,6 +41,8 @@ import javax.crypto.Mac;
  * A simple {@link Fragment} subclass.
  */
 public class MachineDataFragment extends Fragment {
+
+    private Date pickedDate;
 
     public static MachineDataFragment newInstance() {
         return new MachineDataFragment();
@@ -80,7 +92,50 @@ public class MachineDataFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                })
-                .show();
+                });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
+        Button pickDate = dialog.findViewById(R.id.btn_pick_date);
+        pickDate.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                //TODO show another custom alert dialog (datepicker)
+                alertDialogDatePicker();
+            }
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void alertDialogDatePicker(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+        alertDialog.setView(getLayoutInflater().inflate(R.layout.alert_dialog_pick_date, null))
+                .setTitle("Please choose a date")
+                .setCancelable(false)
+                .setPositiveButton("PICK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO assert ke public variable
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+                        Log.d("Testing", dateFormat.format(pickedDate));
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
+
+        DatePicker datePicker = dialog.findViewById(R.id.date_picker);
+        //TODO handle date not change
+        datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, monthOfYear, dayOfMonth);
+                pickedDate = cal.getTime();
+            }
+        });
     }
 }
