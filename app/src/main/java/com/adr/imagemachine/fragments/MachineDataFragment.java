@@ -130,7 +130,6 @@ public class MachineDataFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                //TODO show another custom alert dialog (datepicker)
                 alertDialogDatePicker();
             }
         });
