@@ -19,7 +19,6 @@ public class MachineDataFragment extends Fragment {
         return new MachineDataFragment();
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
