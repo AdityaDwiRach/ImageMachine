@@ -1,35 +1,60 @@
 package com.adr.imagemachine.adapters;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.util.Log;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.adr.imagemachine.MachineDataDetailActivity;
 import com.adr.imagemachine.R;
-import com.adr.imagemachine.converter.BitmapConverter;
+import com.adr.imagemachine.database.MachineDataEntity;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.List;
 
 public class MachineDataDetailRVAdapter extends RecyclerView.Adapter<MachineDataDetailRVAdapter.ViewHolder> {
 
-    private List<byte[]> dataList;
+    private List<String> dataList;
+    private Context context;
+    private Activity activity;
 
     @NonNull
     @Override
     public MachineDataDetailRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        activity = (Activity) parent.getContext();
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_image_machine_data_detail, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MachineDataDetailRVAdapter.ViewHolder holder, int position) {
-        Bitmap bitmap = new BitmapConverter().byteArraytoBitmap(dataList.get(position));
+    public void onBindViewHolder(@NonNull final MachineDataDetailRVAdapter.ViewHolder holder, int position) {
+        Uri uri = Uri.parse(dataList.get(position));
+        final Bitmap bitmap = getBitmapFromUri(uri);
+
         holder.imageViewThumbnail.setImageBitmap(bitmap);
+        holder.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialogImagePreview(bitmap);
+            }
+        });
     }
 
     @Override
@@ -49,8 +74,40 @@ public class MachineDataDetailRVAdapter extends RecyclerView.Adapter<MachineData
         ImageView imageViewThumbnail = itemView.findViewById(R.id.iv_image_machine);
     }
 
-    public void setDataList(List<byte[]> dataList){
+    public void setDataList(List<String> dataList){
         this.dataList = dataList;
         notifyDataSetChanged();
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri){
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        Bitmap bitmap = null;
+        try {
+            parcelFileDescriptor = activity.getContentResolver().openFileDescriptor(uri, "r");
+            FileDescriptor fileDescriptor = null;
+            if (parcelFileDescriptor != null) {
+                fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                parcelFileDescriptor.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    private void alertDialogImagePreview(Bitmap bitmap){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        View view = View.inflate(context,R.layout.alert_dialog_image_preview, null);
+
+        alertDialog.setView(view)
+                .setCancelable(true);
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
+
+        ImageView image = dialog.findViewById(R.id.iv_image_preview);
+        image.setImageBitmap(bitmap);
     }
 }

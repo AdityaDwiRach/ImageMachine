@@ -1,5 +1,7 @@
 package com.adr.imagemachine.converter;
 
+import android.net.Uri;
+
 import androidx.room.TypeConverter;
 
 import com.google.gson.Gson;
@@ -9,22 +11,22 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
-public class ByteArrayConverter {
+public class StringConverter {
     private static Gson gson = new Gson();
 
     @TypeConverter
-    public static List<byte[]> stringToListByteArray(String data) {
+    public static List<String> stringToListUri(String data) {
         if (data == null) {
             return Collections.emptyList();
         }
 
-        Type listType = new TypeToken<List<byte[]>>() {}.getType();
+        Type listType = new TypeToken<List<String>>() {}.getType();
 
         return gson.fromJson(data, listType);
     }
 
     @TypeConverter
-    public static String listByteArrayToString(List<byte[]> listImage) {
+    public static String listUriToString(List<String> listImage) {
         return gson.toJson(listImage);
     }
 }

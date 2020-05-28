@@ -1,11 +1,6 @@
 package com.adr.imagemachine;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -17,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.View;
@@ -26,17 +22,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.adr.imagemachine.adapters.MachineDataDetailRVAdapter;
-import com.adr.imagemachine.adapters.MachineDataRVAdapter;
 import com.adr.imagemachine.converter.BitmapConverter;
 import com.adr.imagemachine.database.MachineDataEntity;
 import com.adr.imagemachine.database.MachineDatabase;
-import com.adr.imagemachine.fragments.MachineDataFragment;
 
-import org.w3c.dom.Text;
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,12 +46,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-import static android.icu.text.DateTimePatternGenerator.PatternInfo.OK;
-
 public class MachineDataDetailActivity extends AppCompatActivity {
 
     private final int GALLERY_REQUEST = 100;
     private MachineDataDetailRVAdapter machineDataDetailRVAdapter;
+    private int machineID;
+    private String machineName;
+    private String machineType;
+    private int machineQRNumber;
+    private Date lastMaintain;
+    private List<String> imageMachine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,40 +84,51 @@ public class MachineDataDetailActivity extends AppCompatActivity {
 
         if (position > -1 && listData != null){
 
-            textViewID.setText(String.valueOf(listData.get(position).getMachineId()));
-            textViewName.setText(listData.get(position).getMachineName());
-            textViewType.setText(listData.get(position).getMachineType());
-            textViewQRNumber.setText(String.valueOf(listData.get(position).getQrNumber()));
+            machineID = listData.get(position).getMachineId();
+            machineName = listData.get(position).getMachineName();
+            machineType = listData.get(position).getMachineType();
+            machineQRNumber = listData.get(position).getQrNumber();
+            lastMaintain = listData.get(position).getLastMaintainDate();
+            imageMachine = listData.get(position).getMachineImage();
+
+            textViewID.setText(String.valueOf(machineID));
+            textViewName.setText(machineName);
+            textViewType.setText(machineType);
+            textViewQRNumber.setText(String.valueOf(machineQRNumber));
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            textViewLastMaintain.setText(dateFormat.format(listData.get(position).getLastMaintainDate()));
+            textViewLastMaintain.setText(dateFormat.format(lastMaintain));
 
-            machineDataDetailRVAdapter.setDataList(listData.get(position).getMachineImage());
+            if (imageMachine != null){
+                machineDataDetailRVAdapter.setDataList(imageMachine);
+            }
         } else {
             Log.d("Testing", "Data Null");
         }
+
         rv.setAdapter(machineDataDetailRVAdapter);
 
         buttonMachineImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            //TODO choose image in gallery
                 chooseFromGallery();
             }
         });
 
         buttonEdit.setOnClickListener(new View.OnClickListener(){
-
             @Override
             public void onClick(View v) {
-
+                alertDialogAddData();
             }
         });
 
         buttonRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                MachineDataEntity deletedData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
+                deletedData.setMachineId(machineID);
+                new DeleteData(deletedData, getApplicationContext()).execute();
+                finish();
             }
         });
 
@@ -138,20 +153,37 @@ public class MachineDataDetailActivity extends AppCompatActivity {
 
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK){
             if (data != null){
-                List<byte[]> listByteArray = new ArrayList<>();
+                List<String> listImagePath = new ArrayList<>();
+                int totalImage;
+                if (imageMachine != null) {
+                    totalImage = imageMachine.size();
+                } else {
+                    totalImage = 0;
+                }
+
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {
                     for (int i = 0; i < clipData.getItemCount(); i++) {
                         Uri uri = (clipData.getItemAt(i).getUri());
                         Bitmap bitmap = getBitmapFromUri(uri);
-                        listByteArray.add(new BitmapConverter().bitmaptoByteArray(bitmap));
+                        File file = saveBitmap(bitmap, String.valueOf(totalImage + i), getApplicationContext());
+                        listImagePath.add((Uri.fromFile(file).toString()));
                     }
                 }
 
-                if (listByteArray != null && listByteArray.size() > 10){
+                if (listImagePath != null && listImagePath.size() > 10){
                     Toast.makeText(this, "You have choose photo more than 10 photos.", Toast.LENGTH_SHORT).show();
                 } else {
-                    machineDataDetailRVAdapter.setDataList(listByteArray);
+                    if (imageMachine == null) {
+                        imageMachine = listImagePath;
+                    } else {
+                        imageMachine.addAll(listImagePath);
+                    }
+                    MachineDataEntity updateData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
+                    updateData.setMachineId(machineID);
+                    new UpdateData(getApplicationContext(), updateData).execute();
+
+                    machineDataDetailRVAdapter.setDataList(imageMachine);
                 }
             } else {
                 Toast.makeText(this, "You haven't choose photo.", Toast.LENGTH_SHORT).show();
@@ -179,86 +211,105 @@ public class MachineDataDetailActivity extends AppCompatActivity {
         return bitmap;
     }
 
-//    private void alertDialogAddData(){
-//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-//        final View layoutInflater = getLayoutInflater().inflate(R.layout.alert_dialog_add_machine_data, null);
-//        alertDialog.setView(layoutInflater)
-//                .setTitle("Add Machine Data")
-//                .setCancelable(true)
-//                .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        //TODO save to database
-//                        EditText etName = layoutInflater.findViewById(R.id.et_name);
-//                        EditText etType = layoutInflater.findViewById(R.id.et_type);
-//                        EditText etQRNumber = layoutInflater.findViewById(R.id.et_qr_number);
-//
-//                        machineName = etName.getText().toString();
-//                        machineType = etType.getText().toString();
-//                        machineQRNumber = Integer.parseInt(etQRNumber.getText().toString());
-//
-//                        MachineDataEntity newData = new MachineDataEntity(machineName, machineType, machineQRNumber, pickedDate, null);
-//                        new InsertData(newData, getContext()).execute();
-//
-//                        List<MachineDataEntity> listData = new MachineDataFragment.GetAllData(getContext()).getAllData();
-//                        if (listData != null){
-//                            machineDataRVAdapter.setDataList(listData);
-//                        } else {
-//                            Log.d("Testing", "Data Null");
-//                        }
-//                    }
-//                })
-//                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//        AlertDialog dialog = alertDialog.create();
-//        dialog.show();
-//        Button pickDate = dialog.findViewById(R.id.btn_pick_date);
-//        pickDate.setOnClickListener(new View.OnClickListener() {
-//            @RequiresApi(api = Build.VERSION_CODES.O)
-//            @Override
-//            public void onClick(View v) {
-//                alertDialogDatePicker();
-//            }
-//        });
-//    }
-//
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    private void alertDialogDatePicker(){
-//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-//        alertDialog.setView(getLayoutInflater().inflate(R.layout.alert_dialog_pick_date, null))
-//                .setTitle("Please choose a date")
-//                .setCancelable(false)
-//                .setPositiveButton("PICK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        //TODO assert ke public variable
-//                        //TODO nggak perlu di display
-//                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-//
-//                        Log.d("Testing", dateFormat.format(pickedDate));
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//        AlertDialog dialog = alertDialog.create();
-//        dialog.show();
-//
-//        DatePicker datePicker = dialog.findViewById(R.id.date_picker);
-//        //TODO handle date not change
-//        datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
-//            @Override
-//            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar cal = Calendar.getInstance();
-//                cal.set(year, monthOfYear, dayOfMonth);
-//                pickedDate = cal.getTime();
-//            }
-//        });
-//    }
+    private void alertDialogAddData(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        final View layoutInflater = getLayoutInflater().inflate(R.layout.alert_dialog_add_machine_data, null);
+
+        final EditText etName = layoutInflater.findViewById(R.id.et_name);
+        final EditText etType = layoutInflater.findViewById(R.id.et_type);
+        final EditText etQRNumber = layoutInflater.findViewById(R.id.et_qr_number);
+
+        etName.setText(machineName);
+        etType.setText(machineType);
+        etQRNumber.setText(String.valueOf(machineQRNumber));
+
+        alertDialog.setView(layoutInflater)
+                .setTitle("Add Machine Data")
+                .setCancelable(true)
+                .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO save to database
+
+                        machineName = etName.getText().toString();
+                        machineType = etType.getText().toString();
+                        machineQRNumber = Integer.parseInt(etQRNumber.getText().toString());
+
+                        MachineDataEntity updateData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
+                        updateData.setMachineId(machineID);
+                        new MachineDataDetailActivity.UpdateData(getApplicationContext(), updateData).execute();
+
+                        finish();
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
+        Button pickDate = dialog.findViewById(R.id.btn_pick_date);
+        pickDate.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                alertDialogDatePicker();
+            }
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void alertDialogDatePicker(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setView(getLayoutInflater().inflate(R.layout.alert_dialog_pick_date, null))
+                .setTitle("Please choose a date")
+                .setCancelable(false)
+                .setPositiveButton("PICK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO assert ke public variable
+                        //TODO nggak perlu di display
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+                        Log.d("Testing", dateFormat.format(lastMaintain));
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
+
+        DatePicker datePicker = dialog.findViewById(R.id.date_picker);
+        datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, monthOfYear, dayOfMonth);
+                lastMaintain = cal.getTime();
+            }
+        });
+    }
+
+    private File saveBitmap(Bitmap bmp, String index, Context context) {
+        String machineId = String.valueOf(machineID);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 80, bytes);
+        File f = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                + File.separator + "id_" +  machineId + "_" + index + ".jpg");
+        try {
+            f.createNewFile();
+            FileOutputStream fo = new FileOutputStream(f);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return f;
+    }
 
     private static class DeleteData extends AsyncTask<Void, Void, Boolean> {
 
@@ -279,7 +330,9 @@ public class MachineDataDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean){
-                Log.d("Testing", "data deleted");
+                Log.d("Testingdelete", "data deleted");
+            } else {
+                Log.d("Testingdelete", "something wrong");
             }
         }
     }
@@ -327,7 +380,10 @@ public class MachineDataDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean){
-                Log.d("Testing", "data inserted");
+                Log.d("Testing", "data updated");
+            } else {
+                Log.d("Testing", "something wrong");
+
             }
         }
     }

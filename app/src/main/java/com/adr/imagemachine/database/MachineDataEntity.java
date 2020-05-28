@@ -9,7 +9,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.adr.imagemachine.converter.ByteArrayConverter;
+import com.adr.imagemachine.converter.StringConverter;
 import com.adr.imagemachine.converter.DateConverter;
 
 
@@ -29,11 +29,11 @@ public class MachineDataEntity implements Parcelable {
     @TypeConverters(DateConverter.class)
     @ColumnInfo(name = "lastMaintainDate")
     private Date lastMaintainDate;
-    @TypeConverters(ByteArrayConverter.class)
+    @TypeConverters(StringConverter.class)
     @ColumnInfo(name = "machineImage")
-    private List<byte[]> machineImage = null;
+    private List<String> machineImage = null;
 
-    MachineDataEntity(int machineId, String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<byte[]> machineImage) {
+    MachineDataEntity(int machineId, String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<String> machineImage) {
         this.machineId = machineId;
         this.machineName = machineName;
         this.machineType = machineType;
@@ -43,7 +43,7 @@ public class MachineDataEntity implements Parcelable {
     }
 
     @Ignore
-    public MachineDataEntity(String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<byte[]> machineImage) {
+    public MachineDataEntity(String machineName, String machineType, int qrNumber, Date lastMaintainDate, List<String> machineImage) {
         this.machineName = machineName;
         this.machineType = machineType;
         this.qrNumber = qrNumber;
@@ -83,11 +83,11 @@ public class MachineDataEntity implements Parcelable {
         }
     };
 
-    public List<byte[]> getMachineImage() {
+    public List<String> getMachineImage() {
         return machineImage;
     }
 
-    public void setMachineImage(List<byte[]> machineImage) {
+    public void setMachineImage(List<String> machineImage) {
         this.machineImage = machineImage;
     }
 

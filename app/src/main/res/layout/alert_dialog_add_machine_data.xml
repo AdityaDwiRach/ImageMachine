@@ -36,18 +36,6 @@
         android:layout_marginEnd="16dp"
         android:hint="@string/machine_qr_number"/>
 
-    <TextView
-        android:id="@+id/tv_last_maintain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/last_maintained_date"
-        android:textSize="18sp"/>
-
     <Button
         android:id="@+id/btn_pick_date"
         android:layout_width="wrap_content"

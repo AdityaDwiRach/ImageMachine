@@ -1,119 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_machine_data_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/machine_data_detail_caps"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:background="@color/colorAccent"
         android:drawableStart="@drawable/ic_arrow_back"
         android:drawablePadding="16dp"
-        android:textColor="@color/black"
-        android:background="@color/colorAccent"
-        android:textSize="21sp"/>
-
-    <TextView
-        android:id="@+id/tv_id_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="ID"
-        android:textSize="18sp"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/tv_name_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="NAME"
-        android:textSize="18sp"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/tv_type_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="TYPE"
-        android:textSize="18sp"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/tv_qr_number_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="QR NUMBER"
-        android:textSize="18sp"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/tv_date_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="LAST MAINTAINED DATE"
-        android:textSize="18sp"
-        android:textColor="@color/black"/>
-
-    <Button
-        android:id="@+id/btn_image_machine_data_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:text="@string/machine_image_caps"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_machine_data_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
         android:paddingEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" />
+        android:paddingBottom="16dp"
+        android:text="@string/machine_data_detail_caps"
+        android:textColor="@color/black"
+        android:textSize="21sp" />
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp">
+        android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_edit_machine_image_detail"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/edit_caps"
-            android:textSize="18sp"/>
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_remove_machine_image_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="@string/remove_caps"
-            android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/tv_id_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="ID"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/tv_name_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="NAME"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_type_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="TYPE"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_qr_number_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="QR NUMBER"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_date_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="LAST MAINTAINED DATE"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/btn_image_machine_data_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="@string/machine_image_caps" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_machine_data_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:paddingEnd="16dp"
+                android:scrollbars="horizontal" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp">
+
+                <Button
+                    android:id="@+id/btn_edit_machine_image_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_caps"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/btn_remove_machine_image_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/remove_caps"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

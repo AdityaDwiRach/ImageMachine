@@ -214,7 +214,12 @@ public class MachineDataFragment extends Fragment {
 
         @Override
         protected List<MachineDataEntity> doInBackground(Void... voids) {
-            return MachineDatabase.getInstance(context).machineDataDAO().getAllMachineData();
+            List<MachineDataEntity> data = MachineDatabase.getInstance(context).machineDataDAO().getAllMachineData();
+            if (data != null){
+                return data;
+            } else {
+                return null;
+            }
         }
 
         private List<MachineDataEntity> getAllData(){
