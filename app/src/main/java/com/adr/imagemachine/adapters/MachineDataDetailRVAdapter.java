@@ -6,9 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +16,13 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.adr.imagemachine.MachineDataDetailActivity;
 import com.adr.imagemachine.R;
 import com.adr.imagemachine.database.DatabaseRepo;
 import com.adr.imagemachine.database.MachineDataEntity;
-import com.adr.imagemachine.database.MachineDatabase;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class MachineDataDetailRVAdapter extends RecyclerView.Adapter<MachineDataDetailRVAdapter.ViewHolder> {

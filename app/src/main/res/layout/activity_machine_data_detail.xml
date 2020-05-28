@@ -7,7 +7,7 @@
     <Toolbar
         android:id="@+id/tb_machine_data_detail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="ID"
+                android:text="@string/id_caps"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -36,7 +36,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="NAME"
+                android:text="@string/name_caps"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -47,7 +47,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="TYPE"
+                android:text="@string/type_caps"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="QR NUMBER"
+                android:text="@string/qr_number_caps"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -69,7 +69,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="LAST MAINTAINED DATE"
+                android:text="@string/last_maintained_date_caps"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -79,7 +79,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="@string/machine_image_caps" />
+                android:background="@drawable/button_background"
+                android:padding="8dp"
+                android:text="@string/machine_image_caps"
+                android:textColor="@color/white" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_machine_data_detail"
@@ -89,7 +92,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:paddingEnd="16dp"
                 android:scrollbars="horizontal" />
 
             <RelativeLayout
@@ -103,16 +105,18 @@
                     android:id="@+id/btn_edit_machine_image_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/button_background"
                     android:text="@string/edit_caps"
-                    android:textSize="18sp" />
+                    android:textColor="@color/white" />
 
                 <Button
                     android:id="@+id/btn_remove_machine_image_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:background="@drawable/button_background"
                     android:text="@string/remove_caps"
-                    android:textSize="18sp" />
+                    android:textColor="@color/white" />
 
             </RelativeLayout>
         </LinearLayout>
