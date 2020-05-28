@@ -50,7 +50,14 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     @Override
     public void handleResult(Result result) {
         //TODO search in database
-        MachineDataEntity searchData = new DatabaseRepo.SearchData(this, Integer.parseInt(result.getText())).searchData();
+        int resultData = 0;
+        try {
+            resultData = Integer.parseInt(result.getText());
+        } catch (NumberFormatException e){
+            Toast.makeText(this, "Code format not compatible.", Toast.LENGTH_SHORT).show();
+        }
+
+        MachineDataEntity searchData = new DatabaseRepo.SearchData(this, resultData).searchData();
         if (searchData != null){
             List<MachineDataEntity> listData = new DatabaseRepo.GetAllData(this).getAllData();
             int position = 0;
