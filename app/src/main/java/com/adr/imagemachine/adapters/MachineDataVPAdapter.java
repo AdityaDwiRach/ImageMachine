@@ -9,15 +9,13 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.adr.imagemachine.fragments.CodeReaderFragment;
 import com.adr.imagemachine.fragments.MachineDataFragment;
 
-import org.jetbrains.annotations.NotNull;
-
 public class MachineDataVPAdapter extends FragmentPagerAdapter {
 
     public MachineDataVPAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         if (position == 1) {

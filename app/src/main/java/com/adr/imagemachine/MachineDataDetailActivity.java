@@ -174,6 +174,11 @@ public class MachineDataDetailActivity extends AppCompatActivity {
                         File file = saveBitmap(bitmap, String.valueOf(totalImage + i), getApplicationContext());
                         listImagePath.add((Uri.fromFile(file).toString()));
                     }
+                } else {
+                    Uri uri = data.getData();
+                    Bitmap bitmap = getBitmapFromUri(uri);
+                    File file = saveBitmap(bitmap, String.valueOf(totalImage + 1), getApplicationContext());
+                    listImagePath.add((Uri.fromFile(file).toString()));
                 }
 
                 if (listImagePath != null && listImagePath.size() > 10){
