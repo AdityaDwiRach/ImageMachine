@@ -63,7 +63,6 @@ public class MachineDataRVAdapter extends RecyclerView.Adapter<MachineDataRVAdap
 
     public void setDataList(List<MachineDataEntity> dataList){
         this.dataList = new ArrayList<>(dataList);
-        Log.d("Testing", dataList.toString());
         notifyDataSetChanged();
     }
 }

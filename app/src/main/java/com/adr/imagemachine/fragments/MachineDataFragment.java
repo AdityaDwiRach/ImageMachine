@@ -78,19 +78,9 @@ public class MachineDataFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.item_sort_name: {
                 if (listData != null){
-                    List<MachineDataEntity> listSorted = new ArrayList<>(listData);
-                    Collections.sort(listSorted, new Comparator<MachineDataEntity>() {
-                        @Override
-                        public int compare(MachineDataEntity a1, MachineDataEntity a2) {
-                            return a1.getMachineName().compareTo(a2.getMachineName());
-                        }
-                    });
-                    for (MachineDataEntity machineDataEntity: listSorted){
-                        Log.d("Testingsort", machineDataEntity.getMachineName());
-                    }
-                    machineDataRVAdapter.setDataList(listSorted);
+                    machineDataRVAdapter.setDataList(sortByName(listData));
                 } else {
-                    Log.d("Testing", "Data Null");
+                    Log.e("MachineDataFragment", "Data Null");
                 }
                 break;
             }
@@ -103,12 +93,9 @@ public class MachineDataFragment extends Fragment {
                             return a1.getMachineType().compareTo(a2.getMachineType());
                         }
                     });
-                    for (MachineDataEntity machineDataEntity: listSorted){
-                        Log.d("Testingsort", machineDataEntity.getMachineType());
-                    }
                     machineDataRVAdapter.setDataList(listSorted);
                 } else {
-                    Log.d("Testing", "Data Null");
+                    Log.e("MachineDataFragment", "Data Null");
                 }
                 break;
             }
@@ -138,7 +125,7 @@ public class MachineDataFragment extends Fragment {
         if (listData != null){
             machineDataRVAdapter.setDataList(listData);
         } else {
-            Log.d("Testing", "Data Null");
+            Log.e("MachineDataFragment", "Data Null");
         }
         rv.setAdapter(machineDataRVAdapter);
 
@@ -174,9 +161,9 @@ public class MachineDataFragment extends Fragment {
 
                         listData = new DatabaseRepo.GetAllData(getContext()).getAllData();
                         if (listData != null){
-                            machineDataRVAdapter.setDataList(listData);
+                            machineDataRVAdapter.setDataList(sortByName(listData));
                         } else {
-                            Log.d("Testing", "Data Null");
+                            Log.e("MachineDataFragment", "Data Null");
                         }
                     }
                 })
@@ -205,9 +192,9 @@ public class MachineDataFragment extends Fragment {
 
         listData = new DatabaseRepo.GetAllData(getContext()).getAllData();
         if (listData != null){
-            machineDataRVAdapter.setDataList(listData);
+            machineDataRVAdapter.setDataList(sortByName(listData));
         } else {
-            Log.d("Testing", "Data Null");
+            Log.e("MachineDataFragment", "Data Null");
         }
     }
 
@@ -236,5 +223,16 @@ public class MachineDataFragment extends Fragment {
                 pickedDate = cal.getTime();
             }
         });
+    }
+
+    private List<MachineDataEntity> sortByName(List<MachineDataEntity> listData){
+        List<MachineDataEntity> listSorted = new ArrayList<>(listData);
+        Collections.sort(listSorted, new Comparator<MachineDataEntity>() {
+            @Override
+            public int compare(MachineDataEntity a1, MachineDataEntity a2) {
+                return a1.getMachineName().compareTo(a2.getMachineName());
+            }
+        });
+        return listSorted;
     }
 }

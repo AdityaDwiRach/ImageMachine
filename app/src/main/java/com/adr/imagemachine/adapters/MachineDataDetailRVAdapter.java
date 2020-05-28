@@ -123,12 +123,6 @@ public class MachineDataDetailRVAdapter extends RecyclerView.Adapter<MachineData
             @Override
             public void onClick(View v) {
                 dataList.remove(position);
-                if (dataList == null){
-                    Log.d("testinglist", "ini jalan");
-                } else {
-                    Log.d("testinglist", "ini yang jalan");
-
-                }
                 MachineDataEntity updateMachineData = currentMachineData;
                 updateMachineData.setMachineImage(dataList);
                 new DatabaseRepo.UpdateData(context, updateMachineData).execute();

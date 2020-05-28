@@ -3,9 +3,7 @@ package com.adr.imagemachine.database;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.adr.imagemachine.MachineDataDetailActivity;
-import com.adr.imagemachine.ScannerActivity;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +29,7 @@ public class DatabaseRepo {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean){
-                Log.d("Testing", "data inserted");
+                Toast.makeText(context, "Data successfully inserted.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -55,9 +53,7 @@ public class DatabaseRepo {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean){
-                Log.d("Testingdelete", "data deleted");
-            } else {
-                Log.d("Testingdelete", "something wrong");
+                Toast.makeText(context, "Data successfully deleted.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -105,10 +101,7 @@ public class DatabaseRepo {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean){
-                Log.d("Testing", "data updated");
-            } else {
-                Log.d("Testing", "something wrong");
-
+                Toast.makeText(context, "Data successfully updated.", Toast.LENGTH_SHORT).show();
             }
         }
     }

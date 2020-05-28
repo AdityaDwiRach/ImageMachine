@@ -115,7 +115,7 @@ public class MachineDataDetailActivity extends AppCompatActivity {
 
             machineDataDetailRVAdapter.setMachineData(listData.get(position));
         } else {
-            Log.d("Testing", "Data Null");
+            Log.e("MachineDataDetailAct", "Data Null");
         }
 
         rv.setAdapter(machineDataDetailRVAdapter);
@@ -275,11 +275,6 @@ public class MachineDataDetailActivity extends AppCompatActivity {
                 .setPositiveButton("PICK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO assert ke public variable
-                        //TODO nggak perlu di display
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-                        Log.d("Testing", dateFormat.format(lastMaintain));
                         dialog.dismiss();
                     }
                 });
