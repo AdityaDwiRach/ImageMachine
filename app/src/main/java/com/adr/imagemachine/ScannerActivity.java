@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.adr.imagemachine.database.DatabaseRepo;
 import com.adr.imagemachine.database.MachineDataEntity;
 import com.adr.imagemachine.database.MachineDatabase;
 import com.adr.imagemachine.fragments.MachineDataFragment;
@@ -49,9 +50,9 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     @Override
     public void handleResult(Result result) {
         //TODO search in database
-        MachineDataEntity searchData = new SearchData(this, Integer.parseInt(result.getText())).searchData();
+        MachineDataEntity searchData = new DatabaseRepo.SearchData(this, Integer.parseInt(result.getText())).searchData();
         if (searchData != null){
-            List<MachineDataEntity> listData = new ScannerActivity.GetAllData(this).getAllData();
+            List<MachineDataEntity> listData = new DatabaseRepo.GetAllData(this).getAllData();
             int position = 0;
 
             if (listData != null) {
@@ -74,55 +75,5 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         }
 
         finish();
-    }
-
-    private static class SearchData extends AsyncTask<Void, Void, MachineDataEntity> {
-
-        private Context context;
-        private int qrNumber;
-
-        SearchData(Context context, int qrNumber) {
-            this.context = context;
-            this.qrNumber = qrNumber;
-        }
-
-        @Override
-        protected MachineDataEntity doInBackground(Void... voids) {
-            return MachineDatabase.getInstance(context).machineDataDAO().searchMachineData(qrNumber);
-        }
-
-        private MachineDataEntity searchData(){
-            try {
-                return new ScannerActivity.SearchData(context, qrNumber).execute().get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-    }
-
-    private static class GetAllData extends AsyncTask<Void, Void, List<MachineDataEntity>>{
-
-        private Context context;
-
-        GetAllData(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected List<MachineDataEntity> doInBackground(Void... voids) {
-            return MachineDatabase.getInstance(context).machineDataDAO().getAllMachineData();
-        }
-
-        private List<MachineDataEntity> getAllData(){
-            try {
-                return new ScannerActivity.GetAllData(context).execute().get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
     }
 }

@@ -13,4 +13,6 @@
     <string name="machine_qr_number">Machine QR Number</string>
     <string name="machine_type">Machine Type</string>
     <string name="machine_name">Machine Name</string>
+    <string name="sort_by_name">Sort By Name</string>
+    <string name="sort_by_type">Sort By Type</string>
 </resources>

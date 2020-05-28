@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,17 +28,23 @@ import android.widget.LinearLayout;
 
 import com.adr.imagemachine.R;
 import com.adr.imagemachine.adapters.MachineDataRVAdapter;
+import com.adr.imagemachine.database.DatabaseRepo;
 import com.adr.imagemachine.database.MachineDataDAO;
 import com.adr.imagemachine.database.MachineDataEntity;
 import com.adr.imagemachine.database.MachineDatabase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+
+import static java.util.Collections.sort;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,9 +56,64 @@ public class MachineDataFragment extends Fragment {
     private String machineType;
     private int machineQRNumber;
     private MachineDataRVAdapter machineDataRVAdapter;
+    private List<MachineDataEntity> listData;
 
     public static MachineDataFragment newInstance() {
         return new MachineDataFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.item_sort_name: {
+                if (listData != null){
+                    List<MachineDataEntity> listSorted = new ArrayList<>(listData);
+                    Collections.sort(listSorted, new Comparator<MachineDataEntity>() {
+                        @Override
+                        public int compare(MachineDataEntity a1, MachineDataEntity a2) {
+                            return a1.getMachineName().compareTo(a2.getMachineName());
+                        }
+                    });
+                    for (MachineDataEntity machineDataEntity: listSorted){
+                        Log.d("Testingsort", machineDataEntity.getMachineName());
+                    }
+                    machineDataRVAdapter.setDataList(listSorted);
+                } else {
+                    Log.d("Testing", "Data Null");
+                }
+                break;
+            }
+            case R.id.item_sort_type: {
+                if (listData != null){
+                    List<MachineDataEntity> listSorted = new ArrayList<>(listData);
+                    Collections.sort(listSorted, new Comparator<MachineDataEntity>() {
+                        @Override
+                        public int compare(MachineDataEntity a1, MachineDataEntity a2) {
+                            return a1.getMachineType().compareTo(a2.getMachineType());
+                        }
+                    });
+                    for (MachineDataEntity machineDataEntity: listSorted){
+                        Log.d("Testingsort", machineDataEntity.getMachineType());
+                    }
+                    machineDataRVAdapter.setDataList(listSorted);
+                } else {
+                    Log.d("Testing", "Data Null");
+                }
+                break;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -70,7 +134,7 @@ public class MachineDataFragment extends Fragment {
         rv.setLayoutManager(linearLayoutManager);
 
         machineDataRVAdapter = new MachineDataRVAdapter();
-        List<MachineDataEntity> listData = new GetAllData(getContext()).getAllData();
+        listData = new DatabaseRepo.GetAllData(getContext()).getAllData();
         if (listData != null){
             machineDataRVAdapter.setDataList(listData);
         } else {
@@ -106,9 +170,9 @@ public class MachineDataFragment extends Fragment {
                         machineQRNumber = Integer.parseInt(etQRNumber.getText().toString());
 
                         MachineDataEntity newData = new MachineDataEntity(machineName, machineType, machineQRNumber, pickedDate, null);
-                        new InsertData(newData, getContext()).execute();
+                        new DatabaseRepo.InsertData(newData, getContext()).execute();
 
-                        List<MachineDataEntity> listData = new GetAllData(getContext()).getAllData();
+                        listData = new DatabaseRepo.GetAllData(getContext()).getAllData();
                         if (listData != null){
                             machineDataRVAdapter.setDataList(listData);
                         } else {
@@ -139,7 +203,7 @@ public class MachineDataFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        List<MachineDataEntity> listData = new GetAllData(getContext()).getAllData();
+        listData = new DatabaseRepo.GetAllData(getContext()).getAllData();
         if (listData != null){
             machineDataRVAdapter.setDataList(listData);
         } else {
@@ -156,11 +220,6 @@ public class MachineDataFragment extends Fragment {
                 .setPositiveButton("PICK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO assert ke public variable
-                        //TODO nggak perlu di display
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-                        Log.d("Testing", dateFormat.format(pickedDate));
                         dialog.dismiss();
                     }
                 });
@@ -169,7 +228,6 @@ public class MachineDataFragment extends Fragment {
         dialog.show();
 
         DatePicker datePicker = dialog.findViewById(R.id.date_picker);
-        //TODO handle date not change
         datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -178,58 +236,5 @@ public class MachineDataFragment extends Fragment {
                 pickedDate = cal.getTime();
             }
         });
-    }
-
-    private static class InsertData extends AsyncTask<Void, Void, Boolean>{
-
-        private MachineDataEntity machineDataEntity;
-        private Context context;
-
-        InsertData(MachineDataEntity machineDataEntity, Context context) {
-            this.machineDataEntity = machineDataEntity;
-            this.context = context;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            MachineDatabase.getInstance(context).machineDataDAO().insertMachineData(machineDataEntity);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean){
-                Log.d("Testing", "data inserted");
-            }
-        }
-    }
-
-    private static class GetAllData extends AsyncTask<Void, Void, List<MachineDataEntity>>{
-
-        private Context context;
-
-        GetAllData(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected List<MachineDataEntity> doInBackground(Void... voids) {
-            List<MachineDataEntity> data = MachineDatabase.getInstance(context).machineDataDAO().getAllMachineData();
-            if (data != null){
-                return data;
-            } else {
-                return null;
-            }
-        }
-
-        private List<MachineDataEntity> getAllData(){
-            try {
-                return new GetAllData(context).execute().get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
     }
 }

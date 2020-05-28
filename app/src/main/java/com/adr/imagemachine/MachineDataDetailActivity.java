@@ -1,6 +1,5 @@
 package com.adr.imagemachine;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -8,8 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -29,9 +29,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adr.imagemachine.adapters.MachineDataDetailRVAdapter;
-import com.adr.imagemachine.converter.BitmapConverter;
+import com.adr.imagemachine.database.DatabaseRepo;
 import com.adr.imagemachine.database.MachineDataEntity;
-import com.adr.imagemachine.database.MachineDatabase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,7 +43,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 public class MachineDataDetailActivity extends AppCompatActivity {
 
@@ -62,10 +60,11 @@ public class MachineDataDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_machine_data_detail);
 
+        Toolbar toolbar = findViewById(R.id.tb_machine_data_detail);
+
         Button buttonMachineImage = findViewById(R.id.btn_image_machine_data_detail);
         Button buttonEdit = findViewById(R.id.btn_edit_machine_image_detail);
         Button buttonRemove = findViewById(R.id.btn_remove_machine_image_detail);
-        TextView textViewBack = findViewById(R.id.tv_machine_data_detail);
         TextView textViewID = findViewById(R.id.tv_id_machine_data_detail);
         TextView textViewName = findViewById(R.id.tv_name_machine_data_detail);
         TextView textViewType = findViewById(R.id.tv_type_machine_data_detail);
@@ -74,13 +73,24 @@ public class MachineDataDetailActivity extends AppCompatActivity {
 
         RecyclerView rv = findViewById(R.id.rv_machine_data_detail);
 
+        toolbar.setTitle("Machine Data Detail");
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
         rv.setLayoutManager(linearLayoutManager);
 
         machineDataDetailRVAdapter = new MachineDataDetailRVAdapter();
         int position = getIntent().getIntExtra("dataposition", 0);
-        List<MachineDataEntity> listData = new MachineDataDetailActivity.GetAllData(this).getAllData();
+        List<MachineDataEntity> listData = new DatabaseRepo.GetAllData(this).getAllData();
 
         if (position > -1 && listData != null){
 
@@ -102,6 +112,8 @@ public class MachineDataDetailActivity extends AppCompatActivity {
             if (imageMachine != null){
                 machineDataDetailRVAdapter.setDataList(imageMachine);
             }
+
+            machineDataDetailRVAdapter.setMachineData(listData.get(position));
         } else {
             Log.d("Testing", "Data Null");
         }
@@ -127,14 +139,7 @@ public class MachineDataDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 MachineDataEntity deletedData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
                 deletedData.setMachineId(machineID);
-                new DeleteData(deletedData, getApplicationContext()).execute();
-                finish();
-            }
-        });
-
-        textViewBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                new DatabaseRepo.DeleteData(deletedData, getApplicationContext()).execute();
                 finish();
             }
         });
@@ -181,7 +186,7 @@ public class MachineDataDetailActivity extends AppCompatActivity {
                     }
                     MachineDataEntity updateData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
                     updateData.setMachineId(machineID);
-                    new UpdateData(getApplicationContext(), updateData).execute();
+                    new DatabaseRepo.UpdateData(getApplicationContext(), updateData).execute();
 
                     machineDataDetailRVAdapter.setDataList(imageMachine);
                 }
@@ -237,7 +242,7 @@ public class MachineDataDetailActivity extends AppCompatActivity {
 
                         MachineDataEntity updateData = new MachineDataEntity(machineName, machineType, machineQRNumber, lastMaintain, imageMachine);
                         updateData.setMachineId(machineID);
-                        new MachineDataDetailActivity.UpdateData(getApplicationContext(), updateData).execute();
+                        new DatabaseRepo.UpdateData(getApplicationContext(), updateData).execute();
 
                         finish();
                     }
@@ -309,82 +314,5 @@ public class MachineDataDetailActivity extends AppCompatActivity {
         }
 
         return f;
-    }
-
-    private static class DeleteData extends AsyncTask<Void, Void, Boolean> {
-
-        private MachineDataEntity machineDataEntity;
-        private Context context;
-
-        DeleteData(MachineDataEntity machineDataEntity, Context context) {
-            this.machineDataEntity = machineDataEntity;
-            this.context = context;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            MachineDatabase.getInstance(context).machineDataDAO().deleteMachineData(machineDataEntity);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean){
-                Log.d("Testingdelete", "data deleted");
-            } else {
-                Log.d("Testingdelete", "something wrong");
-            }
-        }
-    }
-
-    private static class GetAllData extends AsyncTask<Void, Void, List<MachineDataEntity>>{
-
-        private Context context;
-
-        GetAllData(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected List<MachineDataEntity> doInBackground(Void... voids) {
-            return MachineDatabase.getInstance(context).machineDataDAO().getAllMachineData();
-        }
-
-        private List<MachineDataEntity> getAllData(){
-            try {
-                return new MachineDataDetailActivity.GetAllData(context).execute().get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-    }
-
-    private static class UpdateData extends AsyncTask<Void, Void, Boolean>{
-
-        private Context context;
-        private MachineDataEntity machineDataEntity;
-
-        UpdateData(Context context, MachineDataEntity machineDataEntity) {
-            this.context = context;
-            this.machineDataEntity = machineDataEntity;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            MachineDatabase.getInstance(context).machineDataDAO().updateMachineData(machineDataEntity);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean){
-                Log.d("Testing", "data updated");
-            } else {
-                Log.d("Testing", "something wrong");
-
-            }
-        }
     }
 }
